@@ -1,0 +1,8 @@
+{
+  "require": {
+    "sendgrid/sendgrid": "~7",
+    "vlucas/phpdotenv": "^5.3",
+    "twig/twig": "^3.3",
+    "go/db": "^2.2"
+  }
+}

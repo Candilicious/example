@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"> 
+	<link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+	<title>Рассылка писем</title>
+	<link rel="stylesheet" type="text/css" href="assets/style/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/style/style.css">
+
+	<script src="assets/js/jquery-3.2.1.slim.min.js"></script>
+	<script src="assets/js/popper.min.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="assets/js/datatables.js"></script>
+	<!-- Сортировка таблиц -->
+	<script type="text/javascript"> $(document).ready( function () {$('table').DataTable( {} );} );</script>
+</head>
+<body>
+	<div class="container">
+		<h1 class="text-center mt-4 text-info">Рассылка писем</h1>
+	</div>
+	<div class="container mt-3">
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+				<a class="nav-link active" data-toggle="tab" href="#mailing">Рассылка</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#history_mailing">История рассылок</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#contacts">Контакты</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#help">Информация</a>
+			</li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane fade show active" id="mailing">
+				<form method="POST" action="index.php">
+					<p class="">Внешний вид шаблонов писем можно посмотреть и изменить по <a href="https://sendgrid.com/" target="_blank">ссылке</a> (пароль лежит в pm "Sendgrid 01ms.ru")</p>
+					<div class="form-group">
+						<label for="inputState">Шаблон</label>
+						<select id="inputState" class="form-control" name="template">
+							{% for i in 0..count_templates-1 %}
+							<option value="{{templates.templates[i].id}}" {% if (id_template==templates.templates[i].id) %} selected {% endif %}>{{ templates.templates[i].name}} ({{ templates.templates[i].id}})</option>
+							{% endfor %}
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="Textarea">Email получателей (указываются через разделитель <b>, ; - | или каждый элемент с новой строки, или пробел</b>)</label>
+						<textarea required class="form-control" id="Textarea" rows="5" name="string_email" type="text">{% if string_email is defined  %}{{string_email}}{% endif %}</textarea>
+					</div>
+					<p class="text-danger">{% if string_error is defined %}{{string_error}}{% endif %}</p>
+
+					<p class="text-success">{% if array_email|length>=1 %}
+						Письма успешно высланы следующим пользователям: {% for email in array_email %} {{email}} {% endfor %}
+					{% endif %}</p>
+					<input type="submit" class="btn btn-info">
+				</form>
+			</div>
+			<div class="tab-pane fade" id="history_mailing">
+				<table class="table table-bordered table-striped display mt-2" id="table_firms">
+					<thead>
+						<tr>
+							<th scope="col">Имя</th>
+							<th scope="col">Email</th>
+							<th scope="col">Дата и время отправки</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							{% for history in array_history %}
+							<td>{{ history.name_contact}}</td>
+							<td>{{ history.email}}</td>
+							<td>{{ history.datetime}}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="tab-pane fade" id="contacts">
+				<p class=""><b>Желательно</b> автоматически импортировать адреса контактов в таблицу Contact и Email с помощью встроенной функции в phpmyadmin Import (например, из файла csv)<br>
+					<i>При отправке на еще ни разу неиспользуемый адрес, автоматически создается контакт, его имя можно задать в базе данных history_sendgrid в таблице Contact (email в таблице Email) для дальнейшего использования в истории рассылок</i></p>
+					<table class="table table-bordered table-striped display" id="table_contacts">
+						<thead>
+							<tr>
+								<th scope="col">Id</th>
+								<th scope="col">Имя</th>
+								<th scope="col">Email</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								{% for contact in contacts %}
+								<td>{{ contact.id_contact}}</td>
+								<td>{{ contact.name_contact}}</td>
+								<td>{{ contact.email}}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="tab-pane fade" id="help">
+					<ul>
+						<li>
+							По умолчанию рассылка настроена на личный кабинет хостинга 01ms.ru. Для изменения поменяйте ключ API (SENDGRID_API_KEY) и остальные настройки в файле .env
+						</li>
+						<li> Статистику по рассылке можно посмотреть в личном кабинете Sendgreed по <a href="https://sendgrid.com/" target="_blank">ссылке</a> (пароль лежит в pm "Sendgrid 01ms.ru")</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+
+		<!--Прелоадер-->
+		<div id="hellopreloader"><div id="hellopreloader_preload"></div><p></p></div>
+		<script src="assets/js/preloader.js"></script>
+</body>
+</html>
